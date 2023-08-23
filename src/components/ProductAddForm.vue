@@ -5,7 +5,7 @@ import useImage from "@/composables/useImage";
 import { useProductsStore } from "@/stores/products";
 
 const { url, onFileChange, isImageUploaded } = useImage();
-const products = useProductsStore();
+const productsStore = useProductsStore();
 
 const router = useRouter();
 
@@ -20,7 +20,7 @@ const formData = reactive({
 const handleSubmit = async (data) => {
   const { image, ...values } = data;
   try {
-    await products.createProduct({
+    await productsStore.createProduct({
       ...values,
       image: url.value,
     });
@@ -78,7 +78,7 @@ const handleSubmit = async (data) => {
       :validation-messages="{
         required: 'La categoría es obligatoria.',
       }"
-      :options="products.categoryOptions"
+      :options="productsStore.categoryOptions"
       v-model.number="formData.category"
     />
 

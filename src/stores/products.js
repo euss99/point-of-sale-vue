@@ -1,7 +1,15 @@
 import { computed } from "vue";
 import { defineStore } from "pinia";
-import { useFirestore } from "vuefire";
-import { collection, addDoc } from "firebase/firestore";
+import { useFirestore, useCollection } from "vuefire";
+import {
+  collection,
+  addDoc,
+  where,
+  query,
+  limit,
+  orderBy,
+  updateDoc,
+} from "firebase/firestore";
 
 export const useProductsStore = defineStore("products", () => {
   const db = useFirestore();
@@ -11,9 +19,29 @@ export const useProductsStore = defineStore("products", () => {
     { id: 3, name: "Lentes" },
   ];
 
+  const productRef = collection(db, "products"); // Referencia a la collecion de datos
+
+  // Obteniendo los productos
+  const q = query(productRef);
+  const productsCollection = useCollection(q);
+
+  // Creando un producto
   async function createProduct(product) {
-    // const productRef = ;
-    await addDoc(collection(db, "products"), product);
+    await addDoc(productRef, product);
+  }
+
+  // Editar un producto
+  async function updateProduct(docRef, product) {
+    const { image, url, ...values } = product;
+
+    if (image.length) {
+      await updateDoc(docRef, {
+        ...values,
+        image: url.value,
+      });
+    } else {
+      await updateDoc(docRef, values);
+    }
   }
 
   // Estructura aceptada en las opciones de FormKit:
@@ -29,5 +57,13 @@ export const useProductsStore = defineStore("products", () => {
     return options;
   });
 
-  return { createProduct, categoryOptions };
+  const noResults = computed(() => productsCollection.value.length === 0);
+
+  return {
+    productsCollection,
+    createProduct,
+    updateProduct,
+    categoryOptions,
+    noResults,
+  };
 });

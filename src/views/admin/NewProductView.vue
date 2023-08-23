@@ -1,6 +1,6 @@
 <script setup>
 import Link from "@/components/Link.vue";
-import ProductAddForm from "../../components/ProductAddForm.vue";
+import ProductAddForm from "@/components/ProductAddForm.vue";
 </script>
 
 <template>
