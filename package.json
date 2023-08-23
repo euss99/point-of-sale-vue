@@ -10,9 +10,12 @@
   "dependencies": {
     "@formkit/themes": "^0.18.4",
     "@formkit/vue": "^0.18.4",
+    "firebase": "^10.3.0",
     "pinia": "^2.1.6",
+    "uid": "^2.0.2",
     "vue": "^3.3.4",
-    "vue-router": "^4.2.4"
+    "vue-router": "^4.2.4",
+    "vuefire": "^3.1.15"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.5",

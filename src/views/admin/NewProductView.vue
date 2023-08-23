@@ -1,5 +1,8 @@
 <script setup>
-import Link from "../../components/Link.vue";
+import Link from "@/components/Link.vue";
+import useImage from "@/composables/useImage";
+
+const { url, onFileChange, isImageUploaded } = useImage();
 </script>
 
 <template>
@@ -10,7 +13,11 @@ import Link from "../../components/Link.vue";
 
     <div class="flex justify-center bg-white shadow">
       <div class="mt-10 p-10 w-full xl:w-2/4">
-        <FormKit type="form" submit-label="Agregar producto">
+        <FormKit
+          type="form"
+          submit-label="Agregar producto"
+          incomplete-message="No se pudo enviar, revisa que todos los campos esten llenos."
+        >
           <FormKit
             type="text"
             label="Nombre"
@@ -18,7 +25,7 @@ import Link from "../../components/Link.vue";
             placeholder="Nombre de producto"
             validation="required"
             :validation-messages="{
-              required: 'El nombre del producto es obligatorio',
+              required: 'El nombre del producto es obligatorio.',
             }"
           />
 
@@ -28,10 +35,16 @@ import Link from "../../components/Link.vue";
             name="image"
             validation="required"
             :validation-messages="{
-              required: 'La imagen del producto es obligatoria',
+              required: 'La imagen del producto es obligatoria.',
             }"
             accept=".jpg"
+            @change="onFileChange"
           />
+
+          <div v-if="isImageUploaded">
+            <p class="font-black">Imagen producto:</p>
+            <img :src="url" alt="Image preview" class="w-32" />
+          </div>
 
           <FormKit
             type="select"
@@ -39,7 +52,7 @@ import Link from "../../components/Link.vue";
             name="category"
             validation="required"
             :validation-messages="{
-              required: 'La categoría es obligatoria',
+              required: 'La categoría es obligatoria.',
             }"
             :options="[1, 2, 3]"
           />
@@ -51,7 +64,7 @@ import Link from "../../components/Link.vue";
             placeholder="Precio del producto"
             validation="required"
             :validation-messages="{
-              required: 'El precio es obligatorio',
+              required: 'El precio es obligatorio.',
             }"
             min="1"
           />
@@ -63,7 +76,7 @@ import Link from "../../components/Link.vue";
             placeholder="Cantidad disponible"
             validation="required"
             :validation-messages="{
-              required: 'La cantidad es obligatoria',
+              required: 'La cantidad es obligatoria.',
             }"
             min="1"
           />

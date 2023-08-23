@@ -1,12 +1,10 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
-    "./formkit.config.js",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [require("@tailwindcss/forms")],
+export const content = [
+  "./index.html",
+  "./src/**/*.{vue,js,ts,jsx,tsx}",
+  "./formkit.config.js",
+];
+export const theme = {
+  extend: {},
 };
+export const plugins = [require("@tailwindcss/forms")];
