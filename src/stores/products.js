@@ -1,18 +1,22 @@
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { defineStore } from "pinia";
-import { useFirestore, useCollection } from "vuefire";
+import { useFirestore, useCollection, useFirebaseStorage } from "vuefire";
 import {
   collection,
-  addDoc,
-  where,
   query,
-  limit,
-  orderBy,
+  doc,
+  getDoc,
+  addDoc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
+import { ref as storageRef, deleteObject } from "firebase/storage";
 
 export const useProductsStore = defineStore("products", () => {
   const db = useFirestore();
+  const storage = useFirebaseStorage();
+
+  const selectedCategory = ref(1);
   const categories = [
     { id: 1, name: "Sudadera" },
     { id: 2, name: "Tenis" },
@@ -35,12 +39,31 @@ export const useProductsStore = defineStore("products", () => {
     const { image, url, ...values } = product;
 
     if (image.length) {
-      await updateDoc(docRef, {
-        ...values,
-        image: url.value,
-      });
+      const docSnap = await getDoc(docRef);
+      const { image } = docSnap.data();
+      const imageRef = storageRef(storage, image);
+
+      await Promise.all([
+        deleteObject(imageRef),
+        updateDoc(docRef, {
+          ...values,
+          image: url.value,
+        }),
+      ]);
     } else {
       await updateDoc(docRef, values);
+    }
+  }
+
+  // Eliminar un producto
+  async function deleteProduct(id) {
+    if (confirm("¿Deseas eliminar el producto?")) {
+      const docRef = doc(db, "products", id);
+      const docSnap = await getDoc(docRef);
+      const { image } = docSnap.data();
+      const imageRef = storageRef(storage, image);
+
+      await Promise.all([deleteObject(imageRef), deleteDoc(docRef)]);
     }
   }
 
@@ -59,11 +82,21 @@ export const useProductsStore = defineStore("products", () => {
 
   const noResults = computed(() => productsCollection.value.length === 0);
 
+  const filteredProducts = computed(() => {
+    return productsCollection.value.filter(
+      (product) => product.category === selectedCategory.value
+    );
+  });
+
   return {
     productsCollection,
     createProduct,
     updateProduct,
+    deleteProduct,
     categoryOptions,
     noResults,
+    filteredProducts,
+    categories,
+    selectedCategory,
   };
 });

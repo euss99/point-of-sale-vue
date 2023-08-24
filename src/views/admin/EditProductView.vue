@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import Link from "@/components/Link.vue";
-import ProductEditForm from "../../components/ProductEditForm.vue";
+import ProductEditForm from "@/components/ProductEditForm.vue";
 
 const route = useRoute();
 </script>
