@@ -25,15 +25,15 @@ const cartStore = useCartStore();
       <dl class="space-y-4 border-t border-gray-200 pt-4 text-sm font-medium">
         <Amount>
           <template #label>Subtotal:</template>
-          <template #amount>{{ formatCurrency(0) }}</template>
+          <template #amount>{{ formatCurrency(cartStore.subtotal) }}</template>
         </Amount>
         <Amount>
           <template #label>Impuestos:</template>
-          <template #amount>{{ formatCurrency(0) }}</template>
+          <template #amount>{{ formatCurrency(cartStore.taxes) }}</template>
         </Amount>
         <Amount>
           <template #label>Total a pagar:</template>
-          <template #amount>{{ formatCurrency(0) }}</template>
+          <template #amount>{{ formatCurrency(cartStore.total) }}</template>
         </Amount>
       </dl>
     </div>
