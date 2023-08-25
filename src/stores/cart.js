@@ -1,5 +1,8 @@
+import { collection, addDoc, runTransaction, doc } from "firebase/firestore";
 import { ref, computed, watchEffect } from "vue";
+import { getCurrentDate } from "../helpers";
 import { useCuoponStore } from "./cuopon";
+import { useFirestore } from "vuefire";
 import { defineStore } from "pinia";
 
 export const useCartStore = defineStore("cart", () => {
@@ -11,6 +14,7 @@ export const useCartStore = defineStore("cart", () => {
   const TAX_RATE = 0.1;
 
   const cuoponStore = useCuoponStore();
+  const db = useFirestore();
 
   watchEffect(() => {
     subtotal.value = items.value.reduce(
@@ -18,8 +22,10 @@ export const useCartStore = defineStore("cart", () => {
       0
     );
 
-    taxes.value = subtotal.value * TAX_RATE;
-    total.value = (subtotal.value + taxes.value) - cuoponStore.discount;
+    taxes.value = Number((subtotal.value * TAX_RATE).toFixed(2));
+    total.value = Number(
+      (subtotal.value + taxes.value - cuoponStore.discount).toFixed(2)
+    );
   });
 
   const isCartEmpty = computed(() => {
@@ -56,6 +62,47 @@ export const useCartStore = defineStore("cart", () => {
     );
   }
 
+  async function checkout() {
+    try {
+      await addDoc(collection(db, "sales"), {
+        items: items.value.map((item) => {
+          const { availability, category, ...data } = item;
+          return data;
+        }),
+        subtotal: subtotal.value,
+        taxes: taxes.value,
+        discount: cuoponStore.discount,
+        total: total.value,
+        date: getCurrentDate(),
+      });
+
+      // Sustraer la cantidad de lo disponible
+      items.value.forEach(async (item) => {
+        const productRef = doc(db, "products", item.id); // Identificar la referencia del producto
+        await runTransaction(db, async (transaction) => {
+          const currentProduct = await transaction.get(productRef); // Obtenemos el producto
+          const availability =
+            currentProduct.data().availability - item.quantity; // Restamos lo disponible con la cantidad comprada
+
+          transaction.update(productRef, { availability: availability }); // Actualizamos lo disponible
+        });
+      });
+
+      // Reiniciar el state
+      $reset();
+      cuoponStore.$reset();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function $reset() {
+    items.value = [];
+    subtotal.value = 0;
+    taxes.value = 0;
+    total.value = 0;
+  }
+
   const isItemInCart = (id) => items.value.findIndex((item) => item.id === id);
   const isProductAvailable = (item, index) => {
     return (
@@ -74,5 +121,6 @@ export const useCartStore = defineStore("cart", () => {
     addItem,
     removeItem,
     updateQuantity,
+    checkout,
   };
 });

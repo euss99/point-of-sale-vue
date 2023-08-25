@@ -1,7 +1,9 @@
 <script setup>
+import { computed } from "vue";
 import { useProductsStore } from "@/stores/products";
 import { formatCurrency } from "@/helpers";
-defineProps({
+
+const props = defineProps({
   product: {
     type: Object,
     required: true,
@@ -9,11 +11,16 @@ defineProps({
 });
 
 const productsStore = useProductsStore();
+
+const isProductNotAvailable = computed(() => {
+  return props.product.availability === 0;
+});
 </script>
 
 <template>
   <li
     class="flex items-center space-x-6 border border-gray-200 p-6 bg-white shadow"
+    :class="{ 'opacity-30': isProductNotAvailable }"
   >
     <img :src="product.image" :alt="product.name" class="h-24 w-24" />
     <div class="space-y-2 flex-auto">

@@ -11,7 +11,9 @@ export const useCuoponStore = defineStore("cuopon", () => {
   const cartStore = useCartStore();
 
   watch(discountPercentage, () => {
-    discount.value = (cartStore.total * discountPercentage.value).toFixed(2);
+    discount.value = Number(
+      (cartStore.total * discountPercentage.value).toFixed(2)
+    );
   });
 
   const VALID_COUPONS = [
@@ -44,11 +46,19 @@ export const useCuoponStore = defineStore("cuopon", () => {
     }, 4000);
   }
 
+  function $reset() {
+    cuoponInput.value = "";
+    cuoponValidationMessage.value = "";
+    discountPercentage.value = 0;
+    discount.value = 0;
+  }
+
   return {
     cuoponInput,
     cuoponValidationMessage,
     discount,
     isValidCuopon,
     applyCuopon,
+    $reset,
   };
 });

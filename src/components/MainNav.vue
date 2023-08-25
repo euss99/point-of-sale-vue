@@ -34,7 +34,7 @@ const productsStore = useProductsStore();
       </div>
     </div>
     <nav class="flex items-center">
-      <Link class="h-[45px]" to="admin" text="Administrar" />
+      <Link class="h-[45px]" to="sales" text="Administrar" />
     </nav>
   </header>
 </template>
